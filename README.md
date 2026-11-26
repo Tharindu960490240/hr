@@ -103,6 +103,16 @@ One Vercel project serves both: the React app as static files and the Express AP
 > `Password@123`. For a real deployment, leave `SEED_DEMO_DATA` unset, or change every demo password straight away
 > (and remove `SEED_DEMO_DATA` afterwards). The demo-login hint is hidden on the login page in production builds.
 
+**Alternative: two Vercel projects (website + API separately).** If you prefer this, or already set it up this way:
+
+| Project | Root Directory | Framework | Environment variables |
+|---|---|---|---|
+| API | `backend` | Express | `JWT_SECRET`, Neon + Blob connected, `CORS_ORIGIN` and `APP_URL` = the website's URL, optional `SEED_DEMO_DATA=true` |
+| Website | `frontend` | Vite | `VITE_API_URL` = the API project's URL (e.g. `https://office-hr-api.vercel.app`) |
+
+Deploy the API first, then the website. Check `https://<api-url>/api/health` returns `{"ok":true}`.
+After changing `VITE_API_URL` you must redeploy the website (it's baked in at build time).
+
 **Creating your first real admin (no demo data):** from your computer, pull the project's env vars and run
 
 ```bash

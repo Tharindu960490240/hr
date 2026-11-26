@@ -16,7 +16,7 @@
     "db:seed": "npm run seed -w backend",
     "test": "npm test -w backend",
     "build": "npm run build -w frontend",
-    "vercel-build": "node scripts/check-env.js && node backend/src/db/migrate.js && node backend/src/db/seed.js --if-empty && npm run build -w frontend",
+    "vercel-build": "node backend/scripts/check-env.js && node backend/src/db/migrate.js && node backend/src/db/seed.js --if-empty && npm run build -w frontend",
     "create-admin": "npm run create-admin -w backend --"
   },
   "overrides": {

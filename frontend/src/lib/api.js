@@ -1,4 +1,6 @@
 // Small fetch wrapper: adds the token, turns errors into Error(message), logs out on 401.
+// Same domain by default. If the API is a separate deployment, set VITE_API_URL (e.g. https://my-api.vercel.app).
+const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
 const TOKEN_KEY = 'token';
 let onUnauthorized = () => {};
 
@@ -17,7 +19,7 @@ export async function api(path, { method = 'GET', body, form, raw } = {}) {
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   let res;
   try {
-    res = await fetch(`/api${path}`, { method, headers, body: form || (body !== undefined ? JSON.stringify(body) : undefined) });
+    res = await fetch(`${API_BASE}/api${path}`, { method, headers, body: form || (body !== undefined ? JSON.stringify(body) : undefined) });
   } catch {
     throw new ApiError(0, "Can't reach the server. Check your connection and try again.");
   }

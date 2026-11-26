@@ -15,7 +15,8 @@
     "seed": "node src/db/seed.js",
     "setup": "npm run migrate && npm run seed",
     "test": "NODE_ENV=test node --experimental-test-module-mocks --test test/*.test.js",
-    "create-admin": "node src/db/create-admin.js"
+    "create-admin": "node src/db/create-admin.js",
+    "vercel-build": "node scripts/check-env.js && node src/db/migrate.js && node src/db/seed.js --if-empty"
   },
   "dependencies": {
     "@vercel/blob": "^2.9.0",
@@ -32,5 +33,10 @@
     "nodemailer": "^10.6.1",
     "pg": "^8.23.1",
     "zod": "^4.6.7"
+  },
+  "overrides": {
+    "@vercel/cli-config": {
+      "zod": "^4.6.7"
+    }
   }
 }
