@@ -1,0 +1,39 @@
+:root,
+[data-theme="light"] {
+  --bg-color: #f4f6fb;
+  --card-color: #ffffff;
+  --text-color: #1a202c;
+  --muted-color: #64748b;
+  --border-color: rgba(15, 23, 42, 0.08);
+  --link-color: #282c7d;
+  --brand-navy: #282c7d;
+  --brand-red: #ed1f24;
+  --soft-bg: #f1f3f9;
+}
+
+[data-theme="dark"] {
+  --bg-color: #0a0e1a;
+  --card-color: #131826;
+  --text-color: #e6e8f0;
+  --muted-color: #9aa3b5;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --link-color: #9aa0ff;
+  --soft-bg: #1c2231;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+[data-theme="dark"] body {
+  background: radial-gradient(1200px 600px at 50% -10%, #141a33 0%, var(--bg-color) 60%) fixed, var(--bg-color);
+}
+a { color: var(--link-color); }
+
+/* thin scrollbars everywhere */
+* { scrollbar-width: thin; scrollbar-color: rgba(128, 128, 140, 0.45) transparent; }

@@ -1,0 +1,27 @@
+{
+  "name": "office-hr",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev:api": "npm run dev -w backend",
+    "dev:web": "npm run dev -w frontend",
+    "db:migrate": "npm run migrate -w backend",
+    "db:seed": "npm run seed -w backend",
+    "test": "npm test -w backend",
+    "build": "npm run build -w frontend",
+    "vercel-build": "node backend/src/db/migrate.js && node backend/src/db/seed.js --if-empty && npm run build -w frontend",
+    "create-admin": "npm run create-admin -w backend --"
+  },
+  "overrides": {
+    "@vercel/cli-config": {
+      "zod": "^4.6.7"
+    }
+  }
+}
