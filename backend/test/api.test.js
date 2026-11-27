@@ -1,8 +1,9 @@
 // Integration tests against a seeded database:  npm run seed && npm test
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { createApp } from '../src/app.js';
-import { pool } from '../src/db/pool.js';
+process.env.NODE_ENV = 'test'; // set before the app loads (works on Windows too)
+const { createApp } = await import('../src/app.js');
+const { pool } = await import('../src/db/pool.js');
 
 let server, base;
 const tokens = {};

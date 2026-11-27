@@ -17,7 +17,7 @@ Below is what was wrong, grouped by severity. Each item says how the new React +
 | 8 | `GET /employee/all` returns everyone's bank account, NIC and address to any caller. | `dao/employee_dao.js` | List endpoint returns directory fields only; bank/ID/emergency data visible only to the person and admins. |
 | 9 | **Stored XSS**: task descriptions rendered with `innerHTML`. | `all-task`, `view-task` templates | React escapes all text; no raw HTML rendering. |
 | 10 | Wide-open CORS (`*`) set twice, plus a dead CORS middleware registered after the routes. | `index.js`, `middleware/cors.js` | Single `cors()` limited to `CORS_ORIGIN`. |
-| 11 | No brute-force protection on login. | `routes/employee.js` | Rate limit on auth endpoints. |
+| 11 | No brute-force protection on login. | `routes/employee.js` | Failed sign-ins limited to 10 per account per 15 min (successful sign-ins never count, so a whole office on one connection is fine), plus an overall cap per network. |
 | 12 | Uploads: file type trusted from the client, no size limit enforced before buffering, crashes if `pic` field missing, uploaded folder served publicly with `express.static("upload")` (NIC scans readable by anyone who guesses the id). | employee/company/project routes | `multer` with size + MIME limits; files served only through authenticated endpoints. |
 | 13 | Destructive actions on `GET` (`GET /delete/:id`) — can be triggered by a link or a prefetch. | all routes | REST verbs: `DELETE`, `PATCH`, `POST`. |
 

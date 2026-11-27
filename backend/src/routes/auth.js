@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import { z } from 'zod';
 import { one, query } from '../db/pool.js';
 import { config } from '../config.js';
@@ -12,13 +12,19 @@ import { newResetToken, hashToken } from '../lib/tokens.js';
 
 const router = Router();
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: config.env === 'test' ? 1000 : 20,
-  standardHeaders: 'draft-7',
-  legacyHeaders: false,
-  message: { error: 'Too many attempts. Please wait a few minutes and try again.' },
+const TOO_MANY = { error: 'Too many attempts. Please wait a few minutes and try again.' };
+const common = { windowMs: 15 * 60 * 1000, standardHeaders: 'draft-7', legacyHeaders: false, message: TOO_MANY };
+
+// Brute-force guard: only FAILED sign-ins count, per account + network, so a whole office
+// sharing one internet connection can still sign in in the morning.
+const loginLimiter = rateLimit({
+  ...common,
+  limit: config.env === 'test' ? 1000 : 10,
+  skipSuccessfulRequests: true,
+  keyGenerator: (req) => `${ipKeyGenerator(req.ip)}|${String(req.body?.email || '').trim().toLowerCase()}`,
 });
+// Overall cap per network for the auth endpoints (sign-in, forgot / reset password)
+const limiter = rateLimit({ ...common, limit: config.env === 'test' ? 5000 : 300 });
 
 export const passwordSchema = z
   .string()
@@ -41,6 +47,7 @@ export const ME_SQL = `
 router.post(
   '/login',
   limiter,
+  loginLimiter,
   validate(z.object({ email: z.string().trim().email(), password: z.string().min(1).max(128) })),
   async (req, res) => {
     const { email, password } = req.body;

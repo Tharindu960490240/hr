@@ -211,7 +211,7 @@ async function seed() {
     };
 
     const sarah = await addEmp(fixed[0]);
-    const david = await addEmp({ ...fixed[1], reporter: sarah.id });
+    await addEmp({ ...fixed[1], reporter: sarah.id });
     await addEmp({ ...fixed[2], reporter: sarah.id });
     const michael = await addEmp({ ...fixed[3], reporter: sarah.id, job: 'Full-time' });
     managersPerDept.Engineering = michael;

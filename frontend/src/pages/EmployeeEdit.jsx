@@ -71,6 +71,8 @@ export default function EmployeeEdit() {
     end_date: f.end_date && f.start_date && f.end_date < f.start_date && 'Must be after the start date',
     password: !id && setPw && !passwordOk(f.password) && 'Needs 8+ characters with upper & lower case, a number and a symbol',
   };
+  // only hand a select a value once its options exist (avoids MUI "out-of-range value" while lists load)
+  const sel = (list, v) => (v && list.some((o) => o.id === v) ? v : '');
   const roles = can('Super Admin') ? ['Employee', 'Manager', 'Admin', 'Super Admin'] : ['Employee', 'Manager'];
   const self = Number(id) === user.id;
 
@@ -130,12 +132,12 @@ export default function EmployeeEdit() {
           )}
         </Section>
         <Section title="Employment">
-          <F><TextField select label="Department" value={f.department_id} onChange={set('department_id')}><MenuItem value="">—</MenuItem>{depts.data.map((d) => <MenuItem key={d.id} value={d.id}>{d.name}</MenuItem>)}</TextField></F>
-          <F><TextField select label="Designation" value={f.designation_id} onChange={set('designation_id')} disabled={!f.department_id} helperText={!f.department_id ? 'Choose a department first' : ''}>
+          <F><TextField select label="Department" value={sel(depts.data, f.department_id)} onChange={set('department_id')}><MenuItem value="">—</MenuItem>{depts.data.map((d) => <MenuItem key={d.id} value={d.id}>{d.name}</MenuItem>)}</TextField></F>
+          <F><TextField select label="Designation" value={sel(desigs.data.filter((d) => d.department_id === f.department_id), f.designation_id)} onChange={set('designation_id')} disabled={!f.department_id} helperText={!f.department_id ? 'Choose a department first' : ''}>
             <MenuItem value="">—</MenuItem>{desigs.data.filter((d) => d.department_id === f.department_id).map((d) => <MenuItem key={d.id} value={d.id}>{d.name}</MenuItem>)}
           </TextField></F>
-          <F><TextField select label="Branch" value={f.branch_id} onChange={set('branch_id')}><MenuItem value="">—</MenuItem>{branches.data.map((b) => <MenuItem key={b.id} value={b.id}>{b.name}</MenuItem>)}</TextField></F>
-          <F><TextField select label="Employee type" value={f.job_type_id} onChange={set('job_type_id')} helperText="Decides their leave entitlements"><MenuItem value="">—</MenuItem>{jobs.data.map((j) => <MenuItem key={j.id} value={j.id}>{j.name}</MenuItem>)}</TextField></F>
+          <F><TextField select label="Branch" value={sel(branches.data, f.branch_id)} onChange={set('branch_id')}><MenuItem value="">—</MenuItem>{branches.data.map((b) => <MenuItem key={b.id} value={b.id}>{b.name}</MenuItem>)}</TextField></F>
+          <F><TextField select label="Employee type" value={sel(jobs.data, f.job_type_id)} onChange={set('job_type_id')} helperText="Decides their leave entitlements"><MenuItem value="">—</MenuItem>{jobs.data.map((j) => <MenuItem key={j.id} value={j.id}>{j.name}</MenuItem>)}</TextField></F>
           <F><TextField type="date" label="Start date" value={f.start_date} onChange={set('start_date')} slotProps={{ inputLabel: { shrink: true } }} /></F>
           <F><TextField type="date" label="End date (if leaving)" value={f.end_date} onChange={set('end_date')} slotProps={{ inputLabel: { shrink: true } }} error={Boolean(errors.end_date)} helperText={errors.end_date} /></F>
         </Section>

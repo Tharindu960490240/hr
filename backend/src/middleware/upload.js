@@ -42,10 +42,19 @@ export async function saveUpload(file, folder) {
 /** Stream a stored file to the response. */
 export async function sendStored(res, key, cacheControl = 'private, max-age=300') {
   if (!key) throw notFound('File');
-  res.set('Cache-Control', cacheControl);
-  if (!useBlob) return res.sendFile(path.resolve(config.uploadDir, key));
-  const result = await blob.get(key, { access: 'private' });
+  if (!useBlob) {
+    // a missing file (deleted, or uploaded on another machine) is a 404, not a server error
+    const full = path.resolve(config.uploadDir, key);
+    try { await fs.access(full); } catch { throw notFound('File'); }
+    res.set('Cache-Control', cacheControl);
+    return res.sendFile(full);
+  }
+  const result = await blob.get(key, { access: 'private' }).catch((e) => {
+    if (e?.name === 'BlobNotFoundError' || /not found/i.test(e?.message || '')) return null;
+    throw e;
+  });
   if (!result || result.statusCode !== 200) throw notFound('File');
+  res.set('Cache-Control', cacheControl);
   res.type(result.blob.contentType);
   Readable.fromWeb(result.stream).pipe(res);
 }

@@ -58,7 +58,7 @@ export function ProjectForm({ open, onClose, initial, onSaved }) {
         <TextField label="Project name" value={f.name} onChange={(e) => set('name', e.target.value)} autoFocus error={touched && !f.name.trim()} helperText={touched && !f.name.trim() ? 'Give the project a name' : ''} />
         <TextField label="Description" multiline minRows={3} value={f.description} onChange={(e) => set('description', e.target.value)} />
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-          <TextField select label="Category" value={f.category_id} onChange={(e) => set('category_id', e.target.value)}>
+          <TextField select label="Category" value={cats.data.some((c) => c.id === f.category_id) ? f.category_id : ''} onChange={(e) => set('category_id', e.target.value)}>
             <MenuItem value="">None</MenuItem>
             {cats.data.map((c) => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
           </TextField>

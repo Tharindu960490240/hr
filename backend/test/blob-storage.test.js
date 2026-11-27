@@ -21,12 +21,18 @@ mock.module('@vercel/blob', {
   },
 });
 process.env.STORAGE = 'blob';
+process.env.NODE_ENV = 'test';
 const { createApp } = await import('../src/app.js');
 const { pool } = await import('../src/db/pool.js');
 
 const server = createApp().listen(0);
 const base = `http://127.0.0.1:${server.address().port}/api`;
-after(async () => { server.close(); await pool.end(); });
+after(async () => {
+  // leave the shared demo database as we found it (no photo pointing at the in-memory store)
+  await pool.query(`UPDATE employees SET avatar_path = NULL WHERE email = 'employee@example.com'`);
+  server.close();
+  await pool.end();
+});
 
 test('avatar upload/read/replace goes through private Blob storage', async () => {
   const login = await (await fetch(`${base}/auth/login`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: 'employee@example.com', password: 'Password@123' }) })).json();
