@@ -9,7 +9,10 @@ pg.types.setTypeParser(1700, (v) => (v === null ? null : Number(v)));
 // On Vercel each function instance keeps a tiny pool; the database's own pooler (e.g. Neon "-pooler" URL) does the rest.
 // migrations & seeding need a direct (unpooled) connection; Neon on Vercel provides DATABASE_URL_UNPOOLED
 const isScript = /db[\\/](migrate|seed|create-admin)\.js$/.test(process.argv[1] || '');
-const connectionString = (isScript && process.env.DATABASE_URL_UNPOOLED) || config.databaseUrl;
+// Neon gives sslmode=require, which pg already enforces as full certificate checks ("verify-full").
+// Say so explicitly: same security, and no deprecation warning in the logs.
+const connectionString = ((isScript && process.env.DATABASE_URL_UNPOOLED) || config.databaseUrl)
+  .replace(/([?&]sslmode=)(prefer|require|verify-ca)(?=&|$)/, '$1verify-full');
 
 export const pool = new pg.Pool({
   connectionString,
